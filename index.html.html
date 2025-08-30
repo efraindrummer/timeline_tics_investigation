@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Línea de Tiempo - Evolución de las TIC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --com: #3f51b5;
+      --fija: #009688;
+      --movil: #ff9800;
+      --tv: #8bc34a;
+      --hw: #9c27b0;
+      --red: #607d8b;
+      --inet: #e91e63;
+      --cone: #00bcd4;
+      --cons: #795548;
+      --cloud: #2196f3;
+      --iot: #cddc39;
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    h1 {
+      text-align: center;
+      margin: 30px 0 20px 0;
+      color: #fff;
+      font-size: 2.5em;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      animation: titleFloat 3s ease-in-out infinite;
+      position: relative;
+      z-index: 10;
+    }
+    
+    @keyframes titleFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .timeline-container {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 20px 0;
+      scrollbar-width: thin;
+      scrollbar-color: #667eea #f1f1f1;
+      height: 700px;
+    }
+    
+    .timeline-container::-webkit-scrollbar {
+      height: 12px;
+    }
+    
+    .timeline-container::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.1);
+      border-radius: 6px;
+    }
+    
+    .timeline-container::-webkit-scrollbar-thumb {
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      border-radius: 6px;
+    }
+    
+    .timeline {
+      position: relative;
+      width: 8000px;
+      height: 600px;
+      margin: 0 auto;
+      padding: 40px 0;
+    }
+    
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 100px;
+      right: 100px;
+      top: 50%;
+      height: 6px;
+      background: linear-gradient(90deg, 
+        rgba(63,81,181,0.8) 0%, 
+        rgba(0,150,136,0.8) 15%, 
+        rgba(255,152,0,0.8) 30%, 
+        rgba(139,195,74,0.8) 45%, 
+        rgba(156,39,176,0.8) 60%, 
+        rgba(233,30,99,0.8) 75%, 
+        rgba(33,150,243,0.8) 90%, 
+        rgba(205,220,57,0.8) 100%);
+      z-index: 0;
+      border-radius: 3px;
+      box-shadow: 0 4px 20px rgba(102,126,234,0.4);
+      animation: timelineGlow 2s ease-in-out infinite alternate;
+    }
+    
+    @keyframes timelineGlow {
+      0% { box-shadow: 0 4px 20px rgba(102,126,234,0.4); }
+      100% { box-shadow: 0 6px 30px rgba(102,126,234,0.6); }
+    }
+    
+    .event {
+      position: absolute;
+      width: 340px;
+      z-index: 1;
+      opacity: 0;
+      transform: translateY(40px) scale(0.9);
+      transition: all 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+    
+    .event.animate {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    
+    .event.top {
+      top: 80px;
+    }
+    
+    .event.bottom {
+      top: 350px;
+    }
+    
+    .event-content {
+      background: rgba(255,255,255,0.95);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-left: 6px solid;
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    
+    .event-content::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+      transform: translateX(-100%);
+      transition: transform 0.8s;
+    }
+    
+    .event:hover .event-content::before {
+      transform: translateX(100%);
+    }
+    
+    .event:hover .event-content {
+      transform: translateY(-8px) scale(1.05);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    }
+    
+    .event-date {
+      font-weight: bold;
+      color: #333;
+      letter-spacing: 1px;
+      font-size: 1.3em;
+      margin-bottom: 10px;
+      display: block;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .event-title {
+      font-size: 1.15em;
+      margin-bottom: 8px;
+      color: #222;
+      font-weight: 700;
+    }
+    
+    .event-desc {
+      font-size: 0.95em;
+      color: #555;
+      line-height: 1.5;
+    }
+    
+    .event-circle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 24px;
+      height: 24px;
+      background: #fff;
+      border: 5px solid;
+      border-radius: 50%;
+      z-index: 2;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      transition: all 0.4s ease;
+    }
+    
+    .event:hover .event-circle {
+      transform: translate(-50%, -50%) scale(1.4);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    }
+    
+    .event-line {
+      position: absolute;
+      left: 50%;
+      width: 3px;
+      background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.8), transparent);
+      z-index: 1;
+      transform: translateX(-50%);
+      border-radius: 2px;
+    }
+    
+    .event.top .event-line {
+      top: 50%;
+      height: 80px;
+    }
+    
+    .event.bottom .event-line {
+      bottom: 50%;
+      height: 80px;
+    }
+    
+    /* Categoría colores */
+    .Comunicaciones .event-content, .Comunicaciones .event-circle { border-color: var(--com); }
+    .Telefonía\ fija .event-content, .Telefonía\ fija .event-circle { border-color: var(--fija); }
+    .Telefonía\ móvil .event-content, .Telefonía\ móvil .event-circle { border-color: var(--movil); }
+    .Radio\/TV .event-content, .Radio\/TV .event-circle { border-color: var(--tv); }
+    .Televisión .event-content, .Televisión .event-circle { border-color: var(--tv); }
+    .Hardware .event-content, .Hardware .event-circle { border-color: var(--hw); }
+    .Redes\ de\ computadoras .event-content, .Redes\ de\ computadoras .event-circle { border-color: var(--red); }
+    .Internet .event-content, .Internet .event-circle { border-color: var(--inet); }
+    .Conexiones .event-content, .Conexiones .event-circle { border-color: var(--cone); }
+    .Consolas .event-content, .Consolas .event-circle { border-color: var(--cons); }
+    .Cloud\/Internet .event-content, .Cloud\/Internet .event-circle { border-color: var(--cloud); }
+    .Redes\/IoT .event-content, .Redes\/IoT .event-circle { border-color: var(--iot); }
+    
+    .leyenda {
+      max-width: 1200px;
+      margin: 0 auto 25px auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+      font-size: 0.95em;
+      padding: 20px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+    }
+    
+    .leyenda span {
+      display: flex;
+      align-items: center;
+      padding: 10px 15px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 25px;
+      color: #fff;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .leyenda span:hover {
+      background: rgba(255,255,255,0.3);
+      transform: translateY(-3px);
+    }
+    
+    .leyenda .color-box {
+      width: 18px; 
+      height: 18px; 
+      margin-right: 8px; 
+      border-radius: 50%; 
+      display: inline-block;
+      border: 2px solid rgba(255,255,255,0.3);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    
+    .leyenda .com { background: var(--com);}
+    .leyenda .fija { background: var(--fija);}
+    .leyenda .movil { background: var(--movil);}
+    .leyenda .tv { background: var(--tv);}
+    .leyenda .hw { background: var(--hw);}
+    .leyenda .red { background: var(--red);}
+    .leyenda .inet { background: var(--inet);}
+    .leyenda .cone { background: var(--cone);}
+    .leyenda .cons { background: var(--cons);}
+    .leyenda .cloud { background: var(--cloud);}
+    .leyenda .iot { background: var(--iot);}
+    
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .timeline { width: 7000px; }
+      h1 { font-size: 2.2em; }
+    }
+    
+    @media (max-width: 768px) {
+      .timeline { width: 6000px; }
+      .event { width: 300px; }
+      h1 { font-size: 1.8em; }
+      .leyenda { padding: 15px; gap: 10px; }
+      .leyenda span { padding: 8px 12px; }
+    }
+    
+    /* Botones de navegación */
+    .nav-buttons {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 100;
+    }
+    
+    .nav-left {
+      left: 20px;
+    }
+    
+    .nav-right {
+      right: 20px;
+    }
+    
+    .nav-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: #fff;
+      font-size: 24px;
+      padding: 15px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+    
+    .nav-btn:hover {
+      background: rgba(255,255,255,0.3);
+      transform: scale(1.1);
+    }
+    
+    /* Indicador de progreso */
+    .progress-bar {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 300px;
+      height: 8px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <h1>Línea de Tiempo: Evolución de las TIC</h1>
+  <p style="text-align: center; color: rgba(255,255,255,0.9); margin-bottom: 20px; font-size: 1.1em;">
+    Creado por <strong>Efraín May Mayo</strong> - Desplázate horizontalmente para explorar la evolución tecnológica
+  </p>
+  
+  <div class="leyenda">
+    <span data-category="Comunicaciones"><span class="color-box com"></span>Comunicaciones</span>
+    <span data-category="Telefonía fija"><span class="color-box fija"></span>Telefonía fija</span>
+    <span data-category="Telefonía móvil"><span class="color-box movil"></span>Telefonía móvil</span>
+    <span data-category="Televisión"><span class="color-box tv"></span>Televisión / Radio/TV</span>
+    <span data-category="Hardware"><span class="color-box hw"></span>Hardware</span>
+    <span data-category="Redes de computadoras"><span class="color-box red"></span>Redes de computadoras</span>
+    <span data-category="Internet"><span class="color-box inet"></span>Internet</span>
+    <span data-category="Conexiones"><span class="color-box cone"></span>Conexiones</span>
+    <span data-category="Consolas"><span class="color-box cons"></span>Consolas</span>
+    <span data-category="Cloud/Internet"><span class="color-box cloud"></span>Cloud</span>
+    <span data-category="Redes/IoT"><span class="color-box iot"></span>IoT</span>
+  </div>
+  
+  <div class="timeline-container">
+    <div class="timeline">
+      <!-- INICIO EVENTOS -->
+      <div class="event top Comunicaciones" style="left: 100px;" data-year="1837">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1837</span>
+          <div class="event-title">Telégrafo de Morse</div>
+          <div class="event-desc">Primer sistema de comunicación eléctrica a larga distancia; base conceptual de las TIC.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Telefonía fija" style="left: 250px;" data-year="1876">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1876</span>
+          <div class="event-title">Invención del teléfono</div>
+          <div class="event-desc">Alexander Graham Bell realiza la primera llamada telefónica; nace la telefonía fija.</div>
+        </div>
+      </div>
+      
+      <div class="event top Radio/TV" style="left: 400px;" data-year="1895">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1895</span>
+          <div class="event-title">Radio de Marconi</div>
+          <div class="event-desc">Transmisión inalámbrica de señales; preludio de redes móviles y difusión masiva.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Hardware" style="left: 550px;" data-year="1947">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1947</span>
+          <div class="event-title">Transistor</div>
+          <div class="event-desc">Revoluciona la electrónica y permite miniaturizar y abaratar dispositivos TIC.</div>
+        </div>
+      </div>
+      
+      <div class="event top Telefonía fija" style="left: 700px;" data-year="1956">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1956</span>
+          <div class="event-title">TAT‑1 cable transatlántico</div>
+          <div class="event-desc">Telefonía de larga distancia más fiable entre Europa y América.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Conexiones" style="left: 850px;" data-year="1958">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1958</span>
+          <div class="event-title">Módem Bell 101</div>
+          <div class="event-desc">1200 baudios; conecta computadoras sobre líneas telefónicas.</div>
+        </div>
+      </div>
+      
+      <div class="event top Televisión" style="left: 1000px;" data-year="1962">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1962</span>
+          <div class="event-title">Satélite Telstar</div>
+          <div class="event-desc">Primera retransmisión satelital de TV y telefonía.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Redes de computadoras" style="left: 1150px;" data-year="1965">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1965</span>
+          <div class="event-title">Conexión remota de computadoras</div>
+          <div class="event-desc">Primeros experimentos de conexión entre ordenadores distantes.</div>
+        </div>
+      </div>
+      
+      <div class="event top Internet" style="left: 1300px;" data-year="1969">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1969</span>
+          <div class="event-title">ARPANET</div>
+          <div class="event-desc">Primera red conmutada de paquetes; origen de Internet.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Redes de computadoras" style="left: 1450px;" data-year="1970">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1970</span>
+          <div class="event-title">ALOHAnet</div>
+          <div class="event-desc">Red inalámbrica pionera en Hawái; inspira Ethernet y Wi‑Fi.</div>
+        </div>
+      </div>
+      
+      <div class="event top Internet" style="left: 1600px;" data-year="1971">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1971</span>
+          <div class="event-title">Primer e‑mail</div>
+          <div class="event-desc">Envio de correo electrónico por Ray Tomlinson.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Redes de computadoras" style="left: 1750px;" data-year="1973">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1973</span>
+          <div class="event-title">Ethernet</div>
+          <div class="event-desc">Xerox PARC define Ethernet; estándar de LAN por décadas.</div>
+        </div>
+      </div>
+      
+      <div class="event top Redes de computadoras" style="left: 1900px;" data-year="1977">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1977</span>
+          <div class="event-title">ARCNET</div>
+          <div class="event-desc">Una de las primeras LAN comerciales.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Telefonía móvil" style="left: 2050px;" data-year="1979">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1979</span>
+          <div class="event-title">1G móvil (NMT/AMPS)</div>
+          <div class="event-desc">Telefonía móvil analógica en bandas altas; voz con celdas grandes.</div>
+        </div>
+      </div>
+      
+      <div class="event top Internet" style="left: 2200px;" data-year="1983">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1983</span>
+          <div class="event-title">Adopción de TCP/IP</div>
+          <div class="event-desc">'Flag Day' en ARPANET; Internet adopta TCP/IP.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Internet" style="left: 2350px;" data-year="1983">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1983</span>
+          <div class="event-title">DNS</div>
+          <div class="event-desc">Sistema de Nombres de Dominio reemplaza hosts.txt.</div>
+        </div>
+      </div>
+      
+      <div class="event top Telefonía fija" style="left: 2500px;" data-year="1984">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1984</span>
+          <div class="event-title">RDSI/ISDN</div>
+          <div class="event-desc">Digitalización de la red telefónica con servicios integrados.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Internet" style="left: 2650px;" data-year="1985">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1985</span>
+          <div class="event-title">NSFNET</div>
+          <div class="event-desc">Backbone académico que impulsa Internet civil.</div>
+        </div>
+      </div>
+      
+      <div class="event top Telefonía móvil" style="left: 2800px;" data-year="1987">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1987</span>
+          <div class="event-title">Estándar GSM</div>
+          <div class="event-desc">Define la 2G digital; base de la telefonía móvil moderna.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Redes de computadoras" style="left: 2950px;" data-year="1990">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1990</span>
+          <div class="event-title">10BASE‑T</div>
+          <div class="event-desc">Ethernet sobre par trenzado; populariza LAN en empresas y hogares.</div>
+        </div>
+      </div>
+      
+      <div class="event top Internet" style="left: 3100px;" data-year="1991">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1991</span>
+          <div class="event-title">World Wide Web</div>
+          <div class="event-desc">Publicación de la web y el primer sitio por Tim Berners‑Lee.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Telefonía móvil" style="left: 3250px;" data-year="1991">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1991</span>
+          <div class="event-title">2G GSM comercial</div>
+          <div class="event-desc">Telefonía digital, SMS y mejor uso del espectro.</div>
+        </div>
+      </div>
+      
+      <div class="event top Internet" style="left: 3400px;" data-year="1993">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1993</span>
+          <div class="event-title">Navegador Mosaic</div>
+          <div class="event-desc">Acelera la adopción de la web gráfica.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Internet" style="left: 3550px;" data-year="1995">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1995</span>
+          <div class="event-title">Internet comercial y SSL</div>
+          <div class="event-desc">Apertura masiva de la red; inicio del cifrado web.</div>
+        </div>
+      </div>
+      
+      <div class="event top Conexiones" style="left: 3700px;" data-year="1996">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1996</span>
+          <div class="event-title">Módem 56k</div>
+          <div class="event-desc">Acceso dial‑up a mayor velocidad sobre PSTN.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Conexiones" style="left: 3850px;" data-year="1997">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1997</span>
+          <div class="event-title">DOCSIS 1.0</div>
+          <div class="event-desc">Internet por cable coaxial a gran escala.</div>
+        </div>
+      </div>
+      
+      <div class="event top Conexiones" style="left: 4000px;" data-year="1997">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1997</span>
+          <div class="event-title">Wi‑Fi 802.11</div>
+          <div class="event-desc">Primer estándar Wi‑Fi; redes inalámbricas de corto alcance.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Telefonía móvil" style="left: 4150px;" data-year="1997">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1997</span>
+          <div class="event-title">2.5G GPRS</div>
+          <div class="event-desc">Datos por paquetes en redes GSM.</div>
+        </div>
+      </div>
+      
+      <div class="event top Internet" style="left: 4300px;" data-year="1998">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1998</span>
+          <div class="event-title">ICANN</div>
+          <div class="event-desc">Nueva gobernanza de nombres y números de Internet.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Internet" style="left: 4450px;" data-year="1998">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1998</span>
+          <div class="event-title">IPv6 (RFC 2460)</div>
+          <div class="event-desc">Direcciones casi ilimitadas; solución al agotamiento IPv4.</div>
+        </div>
+      </div>
+      
+      <div class="event top Conexiones" style="left: 4600px;" data-year="1999">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1999</span>
+          <div class="event-title">Wi‑Fi 802.11b</div>
+          <div class="event-desc">11 Mbps; impulsa Wi‑Fi doméstico.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Conexiones" style="left: 4750px;" data-year="1999">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">1999</span>
+          <div class="event-title">Bluetooth 1.0</div>
+          <div class="event-desc">Conectividad personal de corto alcance.</div>
+        </div>
+      </div>
+      
+      <div class="event top Telefonía móvil" style="left: 4900px;" data-year="2001">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">2001</span>
+          <div class="event-title">3G UMTS</div>
+          <div class="event-desc">Banda ancha móvil inicial; facilita apps de datos.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Telefonía fija" style="left: 5050px;" data-year="2003">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">2003</span>
+          <div class="event-title">Skype (VoIP)</div>
+          <div class="event-desc">Telefonía por Internet al gran público.</div>
+        </div>
+      </div>
+      
+      <div class="event top Televisión" style="left: 5200px;" data-year="2004">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">2004</span>
+          <div class="event-title">IPTV temprana</div>
+          <div class="event-desc">Televisión sobre IP en operadores.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Internet" style="left: 5350px;" data-year="2005">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">2005</span>
+          <div class="event-title">YouTube</div>
+          <div class="event-desc">Difusión de video en línea y cultura participativa.</div>
+        </div>
+      </div>
+      
+      <div class="event top Cloud/Internet" style="left: 5500px;" data-year="2006">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">2006</span>
+          <div class="event-title">AWS EC2/S3</div>
+          <div class="event-desc">Infraestructura en la nube a demanda (IaaS).</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Telefonía móvil" style="left: 5650px;" data-year="2007">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">2007</span>
+          <div class="event-title">Smartphone moderno</div>
+          <div class="event-desc">iPhone integra web, sensores y apps; cambia el acceso a TIC.</div>
+        </div>
+      </div>
+      
+      <div class="event top Telefonía móvil" style="left: 5800px;" data-year="2008">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">2008</span>
+          <div class="event-title">Android</div>
+          <div class="event-desc">Ecosistema móvil abierto; masificación global.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Telefonía móvil" style="left: 5950px;" data-year="2008">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">2008</span>
+          <div class="event-title">HSPA (3.5G)</div>
+          <div class="event-desc">Mejora velocidades de datos móviles.</div>
+        </div>
+      </div>
+      
+      <div class="event top Telefonía móvil" style="left: 6100px;" data-year="2009">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">2009</span>
+          <div class="event-title">4G LTE</div>
+          <div class="event-desc">Banda ancha móvil IP nativa, baja latencia.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Internet" style="left: 6250px;" data-year="2010">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">2010</span>
+          <div class="event-title">DNSSEC en la raíz</div>
+          <div class="event-desc">Aumenta seguridad del DNS a nivel global.</div>
+        </div>
+      </div>
+      
+      <div class="event top Redes de computadoras" style="left: 6400px;" data-year="2011">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">2011</span>
+          <div class="event-title">SDN/OpenFlow</div>
+          <div class="event-desc">Separación plano control/datos; redes programables.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Internet" style="left: 6550px;" data-year="2012">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">2012</span>
+          <div class="event-title">Lanzamiento mundial de IPv6</div>
+          <div class="event-desc">Despliegue permanente por grandes proveedores.</div>
+        </div>
+      </div>
+      
+      <div class="event top Conexiones" style="left: 6700px;" data-year="2013">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">2013</span>
+          <div class="event-title">DOCSIS 3.1</div>
+          <div class="event-desc">Gigabits sobre cable coaxial.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Conexiones" style="left: 6850px;" data-year="2013">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">2013</span>
+          <div class="event-title">Wi‑Fi 802.11ac</div>
+          <div class="event-desc">Alta velocidad en 5 GHz (Wi‑Fi 5).</div>
+        </div>
+      </div>
+      
+      <div class="event top Conexiones" style="left: 7000px;" data-year="2016">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">2016</span>
+          <div class="event-title">Wi‑Fi 802.11ax</div>
+          <div class="event-desc">Wi‑Fi 6 mejora eficiencia en entornos densos.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Consolas" style="left: 7150px;" data-year="2017">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">2017</span>
+          <div class="event-title">Nintendo Switch</div>
+          <div class="event-desc">Consola híbrida con fuerte enfoque en online.</div>
+        </div>
+      </div>
+      
+      <div class="event top Redes/IoT" style="left: 7300px;" data-year="2018">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">2018</span>
+          <div class="event-title">Edge/IoT</div>
+          <div class="event-desc">Computación en el borde e IoT masivo.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Telefonía móvil" style="left: 7450px;" data-year="2019">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">2019</span>
+          <div class="event-title">5G comercial</div>
+          <div class="event-desc">eMBB/URLLC/mMTC; base para industria 4.0.</div>
+        </div>
+      </div>
+      
+      <div class="event top Conexiones" style="left: 7600px;" data-year="2019">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">2019</span>
+          <div class="event-title">Satélites LEO (Starlink)</div>
+          <div class="event-desc">Banda ancha de baja latencia en áreas remotas.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Consolas" style="left: 7750px;" data-year="2020">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">2020</span>
+          <div class="event-title">PS5/Xbox Series X|S</div>
+          <div class="event-desc">Gráficos avanzados, SSD y servicios online integrados.</div>
+        </div>
+      </div>
+      
+      <div class="event top Conexiones" style="left: 7900px;" data-year="2021">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">2021</span>
+          <div class="event-title">5G SA y Wi‑Fi 6E</div>
+          <div class="event-desc">Núcleo 5G nativo y expansión de 6 GHz.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Internet" style="left: 8050px;" data-year="2022">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">2022</span>
+          <div class="event-title">IA generativa de consumo</div>
+          <div class="event-desc">Nuevos servicios y experiencias digitales.</div>
+        </div>
+      </div>
+      
+      <div class="event top Conexiones" style="left: 8200px;" data-year="2023">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">2023</span>
+          <div class="event-title">Wi‑Fi 7 (802.11be) temprano</div>
+          <div class="event-desc">Primeros dispositivos con agregación multi‑link.</div>
+        </div>
+      </div>
+      
+      <div class="event bottom Telefonía móvil" style="left: 8350px;" data-year="2024">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">2024</span>
+          <div class="event-title">5G‑Advanced (Rel‑18)</div>
+          <div class="event-desc">Funciones avanzadas de 5G (IA en la red, eficiencia).</div>
+        </div>
+      </div>
+      
+      <div class="event top Conexiones" style="left: 8500px;" data-year="2025">
+        <div class="event-circle"></div>
+        <div class="event-line"></div>
+        <div class="event-content">
+          <span class="event-date">2025</span>
+          <div class="event-title">Direct‑to‑cell satélite‑móvil</div>
+          <div class="event-desc">Pruebas de conectividad directa teléfono‑satélite.</div>
+        </div>
+      </div>
+      <!-- FIN EVENTOS -->
+    </div>
+  </div>
+  
+  <!-- Botones de navegación -->
+  <div class="nav-buttons nav-left">
+    <button class="nav-btn" id="scrollLeft">‹</button>
+  </div>
+  <div class="nav-buttons nav-right">
+    <button class="nav-btn" id="scrollRight">›</button>
+  </div>
+  
+  <!-- Indicador de progreso -->
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <script>
+    // Referencias a elementos
+    const timelineContainer = document.querySelector('.timeline-container');
+    const events = document.querySelectorAll('.event');
+    const progressFill = document.getElementById('progressFill');
+    const scrollLeftBtn = document.getElementById('scrollLeft');
+    const scrollRightBtn = document.getElementById('scrollRight');
+    const legendItems = document.querySelectorAll('.leyenda span[data-category]');
+    
+    // Variables para la animación
+    let animationTimeout;
+    
+    // Función para animar eventos
+    function animateEvents() {
+      const containerRect = timelineContainer.getBoundingClientRect();
+      const scrollLeft = timelineContainer.scrollLeft;
+      const containerWidth = timelineContainer.clientWidth;
+      
+      events.forEach((event, index) => {
+        const eventLeft = parseInt(event.style.left);
+        const eventVisible = eventLeft >= scrollLeft - 300 && eventLeft <= scrollLeft + containerWidth + 300;
+        
+        if (eventVisible && !event.classList.contains('animate')) {
+          setTimeout(() => {
+            event.classList.add('animate');
+          }, (index % 10) * 100); // Animar en grupos para mejor performance
+        }
+      });
+      
+      // Actualizar progreso
+      const maxScroll = timelineContainer.scrollWidth - timelineContainer.clientWidth;
+      const progress = (scrollLeft / maxScroll) * 100;
+      progressFill.style.width = `${Math.min(progress, 100)}%`;
+    }
+    
+    // Función para navegación suave
+    function smoothScroll(direction) {
+      const scrollAmount = 500;
+      const currentScroll = timelineContainer.scrollLeft;
+      const targetScroll = direction === 'left' 
+        ? Math.max(0, currentScroll - scrollAmount)
+        : Math.min(timelineContainer.scrollWidth - timelineContainer.clientWidth, currentScroll + scrollAmount);
+      
+      timelineContainer.scrollTo({
+        left: targetScroll,
+        behavior: 'smooth'
+      });
+    }
+    
+    // Event listeners
+    timelineContainer.addEventListener('scroll', () => {
+      clearTimeout(animationTimeout);
+      animationTimeout = setTimeout(animateEvents, 50);
+    });
+    
+    scrollLeftBtn.addEventListener('click', () => smoothScroll('left'));
+    scrollRightBtn.addEventListener('click', () => smoothScroll('right'));
+    
+    // Filtro por categoría
+    legendItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const category = item.dataset.category;
+        
+        // Toggle active state
+        item.classList.toggle('active');
+        
+        // Filter events
+        events.forEach(event => {
+          if (event.classList.contains(category.replace(' ', '\\ ').replace('/', '\\/'))) {
+            event.style.opacity = item.classList.contains('active') ? '1' : '0.3';
+          }
+        });
+      });
+    });
+    
+    // Efectos adicionales
+    events.forEach(event => {
+      event.addEventListener('mouseenter', () => {
+        event.style.zIndex = '100';
+      });
+      
+      event.addEventListener('mouseleave', () => {
+        event.style.zIndex = '1';
+      });
+      
+      // Click para centrar el evento
+      event.addEventListener('click', () => {
+        const eventLeft = parseInt(event.style.left);
+        const targetScroll = eventLeft - (timelineContainer.clientWidth / 2) + 170;
+        
+        timelineContainer.scrollTo({
+          left: Math.max(0, targetScroll),
+          behavior: 'smooth'
+        });
+      });
+    });
+    
+    // Parallax en el fondo
+    timelineContainer.addEventListener('scroll', () => {
+      const scrollPercentage = timelineContainer.scrollLeft / (timelineContainer.scrollWidth - timelineContainer.clientWidth);
+      const newAngle = 135 + (scrollPercentage * 45);
+      document.body.style.background = `linear-gradient(${newAngle}deg, #667eea 0%, #764ba2 100%)`;
+    });
+    
+    // Inicialización
+    setTimeout(() => {
+      animateEvents();
+      
+      // Auto-scroll inicial para mostrar algunos eventos
+      timelineContainer.scrollTo({
+        left: 200,
+        behavior: 'smooth'
+      });
+    }, 500);
+    
+    // Navegación con teclado
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') {
+        smoothScroll('left');
+      } else if (e.key === 'ArrowRight') {
+        smoothScroll('right');
+      }
+    });
+    
+    // Responsive touch gestures
+    let startX = 0;
+    let scrollStartLeft = 0;
+    
+    timelineContainer.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      scrollStartLeft = timelineContainer.scrollLeft;
+    });
+    
+    timelineContainer.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      const deltaX = startX - e.touches[0].clientX;
+      timelineContainer.scrollLeft = scrollStartLeft + deltaX;
+    });
+  </script>
+</body>
+</html>
